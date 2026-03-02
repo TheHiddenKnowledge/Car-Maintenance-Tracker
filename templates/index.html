@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<meta charset = 'UTF-8'>
+<html lang = 'en'>
+<link href = 'https://unpkg.com/tabulator-tables@6.2.1/dist/css/tabulator.min.css' rel = 'stylesheet'>
+<link href = {{ url_for('static', filename='main.css') }} rel = 'stylesheet'>
+<body>
+    <div id = 'title_cont'>
+        <h1>Car Maintenance Tracker</h1>
+    </div>
+    <div id = 'row_cont'>
+        <div id = 'check_cont'>
+            <div>
+                <input id = 'check_input' type = 'number'>
+                <div class = 'button_cont'>
+                    <div id = 'check_button' class = 'button'>Check</div>
+                    <div id = 'clear_status' class = 'button'>Clear Statuses</div>
+                </div>
+            </div>
+        </div>
+        <div id = 'main_cont'>
+            <div class = 'button_cont'>
+                <div id = 'add_button' class = 'button'>&#x271A</div>
+                <div id = 'del_button' class = 'button'>&#x2716</div>
+                <div id = 'clr_button' class = 'button'>&#x27F3</div>
+            </div>
+            <div id = 'table_cont'></div>
+            <div id = 'bottom_cont'></div>
+        </div>
+    </div>
+</body>
+<script type = 'text/javascript' src = 'https://unpkg.com/tabulator-tables@6.2.1/dist/js/tabulator.min.js'></script>
+<script src = {{ url_for('static', filename='index.js') }}></script>
+</html>
