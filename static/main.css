@@ -1,3 +1,14 @@
+/* Global variables */
+:root
+{
+    --padding: 5px;
+    --radius: 10px;
+    --accent_bg: #1B5299;
+    --highlight_bg: #9FC2CC;
+    --body_bg: #F8F9FA;
+}
+
+/* General styles */
 *
 {
     font-family: Arial, Helvetica, sans-serif;
@@ -6,10 +17,21 @@
     margin: 0px;
 }
 
+body
+{
+    background-color: var(--body_bg);
+}
+
 #title_cont
 {
-    background-color:steelblue;
-    padding: 5px;
+    background-color: var(--accent_bg);
+    padding: var(--padding);
+}
+
+#title_text
+{
+    font-size: 24px;
+    color: white;
 }
 
 #row_cont
@@ -22,15 +44,72 @@
     margin: 20px;
 }
 
-#main_cont, #check_cont
+#saved
+{
+    visibility: hidden;
+    opacity: 0;
+    position: fixed;
+    top: 90%;
+    left: 50%;
+    background-color: var(--accent_bg);
+    border: 2px solid black;
+    border-radius: var(--radius);
+    color: white;
+    padding: var(--padding);
+}
+
+#saved.show
+{
+    visibility: visible;
+    opacity: 1;
+    animation: fadeOut .5s forwards;
+    animation-delay: 1s;
+}
+
+@keyframes fadeOut
+{
+    from {opacity: 1;}
+    to {opacity: 0;}
+}
+
+/* Top container styles */
+#check_cont
+{
+    display: inline-block;
+}
+
+#instructions
+{
+    font-weight: bold;
+    width: 50%;
+}
+
+#top_cont
+{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: center;
+    background-color: var(--body_bg);
+    padding: var(--padding);
+    border: 2px solid black;
+    border-radius: var(--radius);
+}
+
+#check_input
+{
+    padding: var(--padding);
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Table container styles */
+#main_cont
 {
     width: fit-content;
     text-align: center;
-}
-
-#main_cont
-{
-    border-radius: 10px;
+    border: 2px solid black;
+    border-radius: var(--radius);
     overflow: hidden;
 }
 
@@ -39,26 +118,26 @@
     height: 50%;
 }
 
+#bottom_cont
+{
+    height: 20px;
+    background-color: var(--accent_bg);
+}
+
+/* Button styles */
 .button_cont
 {
     width: 100%;
     display: flex;
     flex-direction: row;
     justify-content: center;
-    background-color:steelblue;
-}
-
-#bottom_cont
-{
-    height: 20px;
-    background-color:steelblue;
+    background-color: var(--accent_bg);;
 }
 
 .button
 {
-
     padding: 10px 20px;
-    background-color:steelblue;
+    background-color: var(--accent_bg);;
     -webkit-user-select: none; 
     -moz-user-select: none; 
     -ms-user-select: none;     
@@ -66,25 +145,17 @@
     display: flex;
     align-items: center;
     justify-content: center;
+   font-weight: bold;
+   color: white;
 }
 
 .button:hover
 {
     cursor: pointer;
-    background-color: cadetblue;
+    background-color: var(--highlight_bg);
 }
 
-#check_input
-{
-    width: 100%;
-    box-sizing: border-box;
-}
-
-.gear
-{
-    position: absolute;
-    z-index: -1;
-}
+/* Tabulator related styles */
 
 .update_button
 {
@@ -109,4 +180,11 @@
 .center_cell
 {
     text-align: center;
+}
+
+/* Background related styles */
+.gear
+{
+    position: absolute;
+    z-index: -1;
 }

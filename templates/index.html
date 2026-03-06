@@ -1,33 +1,46 @@
 <!DOCTYPE html>
-<meta charset = 'UTF-8'>
 <html lang = 'en'>
-<link href = 'https://unpkg.com/tabulator-tables@6.2.1/dist/css/tabulator.min.css' rel = 'stylesheet'>
-<link href = {{ url_for('static', filename='main.css') }} rel = 'stylesheet'>
+<head>
+    <title>Car Maintenance Tracker</title>
+    <meta charset = 'UTF-8'>
+    <meta name = 'viewport' content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'>
+    <link href = 'https://unpkg.com/tabulator-tables@6.2.1/dist/css/tabulator.min.css' rel = 'stylesheet'>
+    <link href = {{ url_for('static', filename='main.css') }} rel = 'stylesheet'>
+    <script type = 'text/javascript' src = 'https://unpkg.com/tabulator-tables@6.2.1/dist/js/tabulator.min.js'></script>
+    <script src = {{ url_for('static', filename='index.js') }}></script>
+</head>
 <body>
     <div id = 'title_cont'>
-        <h1>Car Maintenance Tracker</h1>
+        <h1 id = 'title_text'>Car Maintenance Tracker</h1>
     </div>
     <div id = 'row_cont'>
-        <div id = 'check_cont'>
-            <div>
+        <div id = 'top_cont'>
+            <div id = 'check_cont'>
                 <input id = 'check_input' type = 'number'>
                 <div class = 'button_cont'>
                     <div id = 'check_button' class = 'button'>Check</div>
                     <div id = 'clear_status' class = 'button'>Clear Statuses</div>
                 </div>
             </div>
+            <p id = 'instructions'>
+                <u>Instructions</u><br>
+                Add rows for each maintenance activity.
+                Enter the duration in miles for checking the maintenance.
+                Use the update button to set the last serviced milage.
+                Use the check button to get the status of all maintenance
+                activities.
+            </p>
         </div>
         <div id = 'main_cont'>
             <div class = 'button_cont'>
-                <div id = 'add_button' class = 'button'>&#x271A</div>
-                <div id = 'del_button' class = 'button'>&#x2716</div>
-                <div id = 'clr_button' class = 'button'>&#x27F3</div>
+                <div id = 'add_button' title = 'Add row' class = 'button'>&#x271A</div>
+                <div id = 'del_button' title = 'Delete selected rows' class = 'button'>&#x2716</div>
+                <div id = 'clr_button' title = 'Delete all rows' class = 'button'>&#x27F3</div>
             </div>
             <div id = 'table_cont'></div>
             <div id = 'bottom_cont'></div>
         </div>
     </div>
+    <div id = 'saved'>Saved</div>
 </body>
-<script type = 'text/javascript' src = 'https://unpkg.com/tabulator-tables@6.2.1/dist/js/tabulator.min.js'></script>
-<script src = {{ url_for('static', filename='index.js') }}></script>
 </html>

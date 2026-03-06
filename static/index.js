@@ -82,25 +82,40 @@ const MILES_LIMIT = 500;
 
 let HAS_CHECKED = false;
 
-initPage();
-generateGears(1);
+window.addEventListener('load', () =>
+{
+    initPage();
+    generateGears(15);
+});
 
+/**
+ * Initializes various aspects of the page.
+ * @returns None
+ */
 function initPage()
 {
     MAIN_TABLE = new Tabulator('#table_cont', TABLE_CONFIG);
-    // MAIN_TABLE.on('cellClick', (e, cell) =>
-    // {
-    //     const row = cell.getRow();
-    //     if(cell.getField() === 'selector' && !HAS_CHECKED)
-    //     {
-    //         row.toggleSelect();
-    //     }
-    // });
-    MAIN_TABLE.on('cellEdited', (cell) =>
+    MAIN_TABLE.on('tableBuilt', () =>
     {
-       TABLE_JSON = MAIN_TABLE.getData(); 
+        const tableStyle =
+        window.getComputedStyle(document.getElementById('table_cont'));
+        document.getElementById('top_cont').style.width = tableStyle.width;
+        document.body.style.minWidth = 1.1 * parseInt(tableStyle.width) + 'px';
+        loadLocal();
     });
-    window.addEventListener('load', loadLocal);
+    MAIN_TABLE.on('cellEdited', () =>
+    {
+        TABLE_JSON = MAIN_TABLE.getData();
+        const popup = document.getElementById('saved');
+        popup.classList.add('show');
+        popup.addEventListener('animationend', removeClass);
+
+        function removeClass(event)
+        {
+            event.target.classList.remove('show');
+            event.target.removeEventListener('animationend', removeClass)
+        }
+    });
     window.addEventListener('pagehide', saveLocal);
     checkInput = document.getElementById('check_input');
     checkInput.addEventListener('focusout', () =>
@@ -122,50 +137,75 @@ function initPage()
     clrButton.addEventListener('click', clrRows);
 }
 
+/**
+ * Generates gears for the background.
+ * @param {Int} count - Number of gears to generate
+ * @returns None
+ */
 function generateGears(count)
 {
     const rowCount = 6;
+    const rowPart = window.innerHeight / rowCount;
     const colCount = 8;
+    const colPart = window.innerWidth / colCount;
     let coordinates = []
     for(let a = 0; a < rowCount; a++)
     {
         let row = []
-        for(let b = 0; b < 8; b++)
+        for(let b = 0; b < colCount; b++)
         {
-            row.push([b * window.innerWidth / colCount, a * window.innerHeight / rowCount]);
+            row.push([b * colPart, a * rowPart]);
         }
         coordinates.push(row);
     }
-    console.log(coordinates);
-    // let prevIndexs = []
-    // for(let a = 0; a < count; a++)
-    // {
-    //     const gear = document.createElement('img');
-    //     gear.classList.add('gear');
-    //     gear.src = 'gear.png';
-    //     const size = window.innerWidth * (Math.random() * (.1 - .05) + .05);
-    //     gear.style.width = Math.ceil(size) + 'px';
-    //     gear.style.height = Math.ceil(size) + 'px';
-    //     while(1 == 1)
-    //     {
-    //         const xIdx = Math.ceil(Math.random() * colCount);
-    //         const yIdx = Math.ceil(Math.random() * rowCount);
-    //         if(!prevIndexs.includes([xIdx, yIdx]))
-    //         {
-    //             const topCoordinate = coordinates[xIdx][yIdx][0] - size / 2;
-    //             const leftCoordinate = coordinates[xIdx][yIdx][1] - size / 2;
-    //             gear.style.left = Math.ceil(topCoordinate) + 'px';
-    //             gear.style.top = Math.ceil(leftCoordinate) + 'px';
-    //             const rotation = Math.random() * 45;
-    //             gear.style.transform = 'rotate(' + Math.ceil(rotation) + 'deg)';
-    //             prevIndexs.push([xIdx, yIdx]);
-    //             break;
-    //         }
-    //     }
-    //     document.body.appendChild(gear);
-    // }
+    const maxSize = (rowPart < colPart) ? rowPart : colPart;
+    let prevIndexs = []
+    for(let a = 0; a < count; a++)
+    {
+        const gear = document.createElement('img');
+        gear.classList.add('gear');
+        gear.src = 'static/gear.png';
+        const size = Math.random() * (.5 * maxSize) + .25 * maxSize;
+        gear.style.width = Math.ceil(size) + 'px';
+        gear.style.height = Math.ceil(size) + 'px';
+        while(1 == 1)
+        {
+            const xIdx = Math.floor(Math.random() * (colCount - 1)) + 1;
+            const yIdx = Math.floor(Math.random() * (rowCount - 1)) + 1;
+            let indexsExist = false;
+            for(let indexs of prevIndexs)
+            {
+                if(indexs[0] === xIdx && indexs[1] === yIdx)
+                {
+                    indexsExist = true;
+                    break;
+                }
+            }
+            if(!indexsExist)
+            {
+                const offsetX = Math.random() * size - size / 2;
+                const offsetY = Math.random() * size - size / 2;
+                const topCoordinate =
+                coordinates[yIdx][xIdx][0] - size / 2 + offsetX;
+                const leftCoordinate =
+                coordinates[yIdx][xIdx][1] - size / 2 + offsetY;
+                gear.style.left = Math.ceil(topCoordinate) + 'px';
+                gear.style.top = Math.ceil(leftCoordinate) + 'px';
+                const rotation = Math.random() * 45;
+                gear.style.transform = 'rotate(' + Math.ceil(rotation) + 'deg)';
+                prevIndexs.push([xIdx, yIdx]);
+                break;
+            }
+        }
+        document.body.appendChild(gear);
+
+    }
 }
 
+/**
+ * Checks the service duration for all table entries.
+ * @returns None
+ */
 function checkService()
 {
     if(MAIN_TABLE.getRows().length > 0)
@@ -203,6 +243,10 @@ function checkService()
     }
 }
 
+/**
+ * Clears the service status for all table entries.
+ * @returns None
+ */
 function clearStatuses()
 {
     MAIN_TABLE.getRows().forEach((row) =>
@@ -213,6 +257,11 @@ function clearStatuses()
     HAS_CHECKED = false;
 }
 
+/**
+ * Removes the status for a single row.
+ * @param {RowComponent} row - Given row from the table
+ * @returns None
+ */
 function removeStatus(row)
 {
     const statusClasses = ['good', 'almost_due', 'past_due'];
@@ -225,12 +274,21 @@ function removeStatus(row)
     }
 }
 
+/**
+ * Adds a row to the table.
+ * @returns None
+ */
 function addRow()
 {
     MAIN_TABLE.addRow({});
     TABLE_JSON = MAIN_TABLE.getData();
 }
 
+/**
+ * Deletes the selected rows.
+ * @param {Boolean} bypass - Bypasses the confirmation prompt if true
+ * @returns None
+ */
 function delRows(bypass)
 {
     if(MAIN_TABLE.getSelectedRows().length > 0)
@@ -246,6 +304,10 @@ function delRows(bypass)
     }
 }
 
+/**
+ * Deletes all rows.
+ * @returns None
+ */
 function clrRows()
 {
     if(MAIN_TABLE.getRows().length > 0)
@@ -258,6 +320,10 @@ function clrRows()
     }
 }
 
+/**
+ * Saves the table and check input data to local storage.
+ * @returns None
+ */
 function saveLocal()
 {
     localStorage.setItem('checkValue', document.getElementById('check_input').value); 
@@ -268,6 +334,10 @@ function saveLocal()
     localStorage.setItem('table', JSON.stringify(TABLE_JSON));
 }
 
+/**
+ * Loads the table and check input data from local storage.
+ * @returns None
+ */
 function loadLocal()
 {
     const checkValue = localStorage.getItem('checkValue');
