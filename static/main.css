@@ -19,7 +19,19 @@
 
 body
 {
+    height: 100vh;
+    position: relative;
     background-color: var(--body_bg);
+}
+
+.left
+{
+    text-align: left;
+}
+
+.right
+{
+    text-align: right;
 }
 
 #title_cont
@@ -28,12 +40,40 @@ body
     padding: var(--padding);
 }
 
-#title_text
+#footer_cont
+{
+    padding: var(--padding);
+    position: absolute;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+}
+
+table.title, table.footer
+{
+    width: 100%;
+}
+
+td.title, td.footer
+{
+    width: 50%;
+}
+
+td.footer
+{
+    vertical-align: bottom;
+}
+
+#title_text, #title_date
 {
     font-size: 24px;
     color: white;
 }
 
+#info
+{
+    font-size: 16px;
+}
 #row_cont
 {
     display: flex;
@@ -183,8 +223,7 @@ body
 }
 
 /* Background related styles */
-.gear
+#car
 {
-    position: absolute;
-    z-index: -1;
+    width: 300px;
 }

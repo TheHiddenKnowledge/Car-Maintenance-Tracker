@@ -82,11 +82,7 @@ const MILES_LIMIT = 500;
 
 let HAS_CHECKED = false;
 
-window.addEventListener('load', () =>
-{
-    initPage();
-    generateGears(15);
-});
+window.addEventListener('load', initPage);
 
 /**
  * Initializes various aspects of the page.
@@ -100,20 +96,42 @@ function initPage()
         const tableStyle =
         window.getComputedStyle(document.getElementById('table_cont'));
         document.getElementById('top_cont').style.width = tableStyle.width;
-        document.body.style.minWidth = 1.1 * parseInt(tableStyle.width) + 'px';
         loadLocal();
-    });
-    MAIN_TABLE.on('cellEdited', () =>
-    {
-        TABLE_JSON = MAIN_TABLE.getData();
-        const popup = document.getElementById('saved');
-        popup.classList.add('show');
-        popup.addEventListener('animationend', removeClass);
-
-        function removeClass(event)
+        let heightSum = 0;
+        for(let child of document.body.children)
         {
-            event.target.classList.remove('show');
-            event.target.removeEventListener('animationend', removeClass)
+            if(child.id !== 'main_cont')
+            {
+                const childStyle = window.getComputedStyle(child);
+                heightSum += parseInt(childStyle.height, 10);
+            }
+            else
+            {
+                const buttonCont = child.getElementsByClas('button_cont')[0];
+                const buttonHeight = parseInt(buttonCont, 10);
+                const bottomCont = child.getElementsByClas('bottom_cont')[0];
+                const bottomHeight = parseInt(bottomCont, 10);
+                heightSum +=
+                buttonHeight + bottomHeight + TABLE_CONFIG.maxHeight;
+            }
+        }
+        document.body.style.minWidth = tableStyle.width;
+        document.body.style.minHeight = heightSum + 20 + 'px';
+    });
+    MAIN_TABLE.on('cellEdited', (cell) =>
+    {
+        if(cell.getField() !== 'service_status')
+        {
+            TABLE_JSON = MAIN_TABLE.getData();
+            const popup = document.getElementById('saved');
+            popup.classList.add('show');
+            popup.addEventListener('animationend', removeClass);
+
+            function removeClass(event)
+            {
+                event.target.classList.remove('show');
+                event.target.removeEventListener('animationend', removeClass)
+            }
         }
     });
     window.addEventListener('pagehide', saveLocal);
@@ -135,71 +153,19 @@ function initPage()
     delButton.addEventListener('click', () => delRows(false));
     clrButton = document.getElementById('clr_button');
     clrButton.addEventListener('click', clrRows);
+    getDate();
+    setInterval(getDate, 1000);
 }
 
 /**
- * Generates gears for the background.
- * @param {Int} count - Number of gears to generate
+ * Gets the date in the title bar.
  * @returns None
  */
-function generateGears(count)
+function getDate()
 {
-    const rowCount = 6;
-    const rowPart = window.innerHeight / rowCount;
-    const colCount = 8;
-    const colPart = window.innerWidth / colCount;
-    let coordinates = []
-    for(let a = 0; a < rowCount; a++)
-    {
-        let row = []
-        for(let b = 0; b < colCount; b++)
-        {
-            row.push([b * colPart, a * rowPart]);
-        }
-        coordinates.push(row);
-    }
-    const maxSize = (rowPart < colPart) ? rowPart : colPart;
-    let prevIndexs = []
-    for(let a = 0; a < count; a++)
-    {
-        const gear = document.createElement('img');
-        gear.classList.add('gear');
-        gear.src = 'static/gear.png';
-        const size = Math.random() * (.5 * maxSize) + .25 * maxSize;
-        gear.style.width = Math.ceil(size) + 'px';
-        gear.style.height = Math.ceil(size) + 'px';
-        while(1 == 1)
-        {
-            const xIdx = Math.floor(Math.random() * (colCount - 1)) + 1;
-            const yIdx = Math.floor(Math.random() * (rowCount - 1)) + 1;
-            let indexsExist = false;
-            for(let indexs of prevIndexs)
-            {
-                if(indexs[0] === xIdx && indexs[1] === yIdx)
-                {
-                    indexsExist = true;
-                    break;
-                }
-            }
-            if(!indexsExist)
-            {
-                const offsetX = Math.random() * size - size / 2;
-                const offsetY = Math.random() * size - size / 2;
-                const topCoordinate =
-                coordinates[yIdx][xIdx][0] - size / 2 + offsetX;
-                const leftCoordinate =
-                coordinates[yIdx][xIdx][1] - size / 2 + offsetY;
-                gear.style.left = Math.ceil(topCoordinate) + 'px';
-                gear.style.top = Math.ceil(leftCoordinate) + 'px';
-                const rotation = Math.random() * 45;
-                gear.style.transform = 'rotate(' + Math.ceil(rotation) + 'deg)';
-                prevIndexs.push([xIdx, yIdx]);
-                break;
-            }
-        }
-        document.body.appendChild(gear);
-
-    }
+    const dateElement = document.getElementById('title_date');
+    const now = new Date();
+    dateElement.innerHTML = now.toLocaleDateString()
 }
 
 /**
@@ -326,11 +292,9 @@ function clrRows()
  */
 function saveLocal()
 {
-    localStorage.setItem('checkValue', document.getElementById('check_input').value); 
-    for(let row of TABLE_JSON)
-    {
-        row.service_status = '';
-    }
+    localStorage.setItem('checkValue',
+    document.getElementById('check_input').value);
+    clearStatuses();
     localStorage.setItem('table', JSON.stringify(TABLE_JSON));
 }
 
